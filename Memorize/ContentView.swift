@@ -8,56 +8,69 @@
 import SwiftUI
 
 struct ContentView: View {
-  let emojis = [
-    "🥳", "🙈", "💁", "🤩", "⚽️", "🛹", "⛷️", "⛷️", "⛷️", "⛷️", "⛷️", "⛷️", "⛷️",
+  let messages = [
+    "microphone", "line.diagonal.arrow", "text.bubble", "phone", "video.slash",
+    "envelope", "recordingtape", "waveform",
   ]
-  @State var cardCount = 4
+  let figures = [
+    "figure.stand.line.dotted.figure.stand", "accessibility", "voiceover",
+    "cursorarrow.rays", "cursorarrow.click.badge.clock", "circle.hexagonpath",
+    "quote.bubble.fill", "eye.slash.circle.fill",
+  ]
+  let games = [
+    "flag.2.crossed", "house", "arcade.stick.console.fill", "l.joystick.fill",
+    "l.joystick.tilt.up", "dpad.up.filled", "paddleshifter.right",
+    "button.horizontal.fill",
+  ]
+  @State var emojis: [String] = []
 
   var body: some View {
     VStack {
+      Text("Memorize!")
+        .font(.largeTitle)
+
       ScrollView {
         cards
       }
-      Spacer()
-      cardCountAdjusters
+
+      themeSelectors
     }
     .padding()
   }
 
-  var cardCountAdjusters: some View {
-    HStack {
-      cardAdder
-      Spacer()
-      cardRemover
-    }
-    .imageScale(.large)
-  }
-
-  func cardCountAdjuster(by offset: Int, symbol: String) -> some View {
+  func themeSelector(iconName: String, iconDesc: String, themeIcons: [String])
+    -> some View
+  {
     Button(
       action: {
-        cardCount += offset
+        emojis = themeIcons
       },
       label: {
-        Image(systemName: symbol)
+        VStack {
+          Image(systemName: iconName).imageScale(.large)
+          Text(iconDesc).font(.caption)
+        }
       }
     )
-    .disabled(cardCount + offset > emojis.count || cardCount + offset < 1)
   }
 
-  var cardAdder: some View {
-    cardCountAdjuster(by: 1, symbol: "folder.badge.plus")
-
-  }
-
-  var cardRemover: some View {
-    cardCountAdjuster(by: -1, symbol: "folder.badge.minus")
+  var themeSelectors: some View {
+    HStack(alignment: .bottom, spacing: 30) {
+      themeSelector(
+        iconName: "message", iconDesc: "Messages", themeIcons: messages)
+      themeSelector(
+        iconName: "figure", iconDesc: "Figures", themeIcons: figures)
+      themeSelector(
+        iconName: "gamecontroller", iconDesc: "Games", themeIcons: games)
+    }
   }
 
   var cards: some View {
-    LazyVGrid(columns: [GridItem(.adaptive(minimum: 100))]) {
-      ForEach(0..<cardCount, id: \.self) { index in
-        CardView(content: emojis[index])
+    LazyVGrid(columns: [GridItem(.adaptive(minimum: 80))]) {
+      var pairs = emojis.shuffled() + emojis.shuffled()
+      
+      ForEach(pairs.indices, id: \.self) { index in
+        CardView(content: pairs[index])
           .aspectRatio(2 / 3, contentMode: .fit)
       }
     }
@@ -67,7 +80,7 @@ struct ContentView: View {
 
 struct CardView: View {
   let content: String
-  @State var isFaceUp = false
+  @State var isFaceUp = true
 
   var body: some View {
     ZStack {
@@ -78,7 +91,7 @@ struct CardView: View {
           .fill(.white)
         base
           .strokeBorder(lineWidth: 2)
-        Text(content)
+        Image(systemName: content)
           .font(.largeTitle)
       }
       .opacity(isFaceUp ? 1 : 0)
@@ -93,3 +106,4 @@ struct CardView: View {
 #Preview {
   ContentView()
 }
+//
